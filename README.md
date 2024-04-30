@@ -1,3 +1,9 @@
+## this project is cloned from react-pdf-highlighter. Three changes:
+1. pdfjs-dist is upgraded to latest version.
+2. add some more annotation
+3. add some more fields in Highlighter.
+
+    
 ☕️ [Buy me a coffee](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SC4D2NS8G2JJ8&source=url)
 
 ![Node CI](https://github.com/agentcooper/react-pdf-highlighter/workflows/Node%20CI/badge.svg)
