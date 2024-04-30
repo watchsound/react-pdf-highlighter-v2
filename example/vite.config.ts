@@ -13,4 +13,12 @@ export default defineConfig({
   define: {
     APP_VERSION: JSON.stringify(process.env.npm_package_version),
   },
+  optimizeDeps: {
+    include: ["pdfjs-dist"], // optionally specify dependency name
+    esbuildOptions: {
+      supported: {
+        "top-level-await": true
+      },
+    },
+  },
 });

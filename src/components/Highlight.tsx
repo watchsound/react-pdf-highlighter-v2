@@ -8,6 +8,8 @@ interface Props {
   position: {
     boundingRect: LTWHP;
     rects: Array<LTWHP>;
+    highlightType: string;
+    color: string;
   };
   onClick?: () => void;
   onMouseOver?: () => void;
@@ -30,7 +32,7 @@ export class Highlight extends Component<Props> {
       isScrolledTo,
     } = this.props;
 
-    const { rects, boundingRect } = position;
+    const { rects, boundingRect, highlightType, color } = position;
 
     return (
       <div
@@ -48,16 +50,22 @@ export class Highlight extends Component<Props> {
           </div>
         ) : null}
         <div className="Highlight__parts">
-          {rects.map((rect, index) => (
-            <div
-              onMouseOver={onMouseOver}
-              onMouseOut={onMouseOut}
-              onClick={onClick}
-              key={index}
-              style={rect}
-              className={`Highlight__part`}
-            />
-          ))}
+          {rects.map((rect, index) => { 
+            let { left, top,width, height } = rect;  
+            if (highlightType == 'underline') { top = top +height-1; height = 2; }
+            if (highlightType == 'dashline') { top = top +height-1; height = 0; }
+            if (highlightType == 'strikeline') { top = top +height/2; height = 2; }
+            return (
+              <div
+                onMouseOver={onMouseOver}
+                onMouseOut={onMouseOut}
+                onClick={onClick}
+                key={index}
+                style={{ left, top, width, height }}
+                className={`Highlight__part Highlight__${highlightType} Highlight__color_${color}`}
+              />
+            )}
+          )}
         </div>
       </div>
     );

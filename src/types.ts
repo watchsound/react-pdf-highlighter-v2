@@ -26,12 +26,16 @@ export interface Position {
   boundingRect: LTWHP;
   rects: Array<LTWHP>;
   pageNumber: number;
+  highlightType: string;
+  color: string;
 }
 
 export interface ScaledPosition {
   boundingRect: Scaled;
   rects: Array<Scaled>;
   pageNumber: number;
+  highlightType: string;
+  color: string;
   usePdfCoordinates?: boolean;
 }
 
@@ -45,8 +49,14 @@ export interface HighlightContent {
 }
 
 export interface Comment {
-  text: string;
+  title: string;
+  summary: string; // summary from openai if not set
+  mindmap: string;
   emoji: string;
+  hasQuiz: boolean;
+  tags: string[];
+  rate: number;
+  highlightOnly: boolean;
 }
 
 export interface HighlightComment {

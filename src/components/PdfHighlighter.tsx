@@ -2,12 +2,23 @@ import "pdfjs-dist/web/pdf_viewer.css";
 import "../style/pdf_viewer.css";
 import "../style/PdfHighlighter.css";
 
-import {
-  EventBus,
-  NullL10n,
-  PDFLinkService,
-  PDFViewer,
-} from "pdfjs-dist/legacy/web/pdf_viewer";
+// import * as pdfjsLib from "pdfjs-dist";
+// import * as pdfWorker from "pdfjs-dist/build/pdf.worker.mjs";
+
+// // Setting the worker path to the worker bundle.
+// pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+
+// Importing the required modules from the pdfjsLib object
+// const {
+//     EventBus,
+//     NullL10n,
+//     PDFLinkService,
+//     PDFViewer
+// } = pdfjsLib.web;
+// import * as pdfjsLib from "pdfjs-dist";
+// import { EventBus, PDFLinkService, PDFViewer } from "pdfjs-dist/web/pdf_viewer";
+ 
+
 import type {
   IHighlight,
   LTWH,
@@ -55,7 +66,7 @@ interface State<T_HT> {
   scrolledToHighlightId: string;
 }
 
-interface Props<T_HT> {
+interface Props<T_HT> {  
   highlightTransform: (
     highlight: T_ViewportHighlight<T_HT>,
     index: number,
@@ -88,6 +99,9 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
   Props<T_HT>,
   State<T_HT>
 > {
+  EventBus = null;   
+  PDFLinkService = null;
+  PDFViewer = null;
   static defaultProps = {
     pdfScaleValue: "auto",
   };
@@ -100,14 +114,12 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
     isAreaSelectionInProgress: false,
     tip: null,
     tipPosition: null,
-    tipChildren: null,
+    tipChildren: null,  
   };
 
-  eventBus = new EventBus();
-  linkService = new PDFLinkService({
-    eventBus: this.eventBus,
-    externalLinkTarget: 2,
-  });
+  eventBus = null;
+  linkService = null;
+ 
 
   viewer!: PDFViewer;
 
@@ -120,15 +132,38 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
   unsubscribe = () => {};
 
   constructor(props: Props<T_HT>) {
-    super(props);
+    super(props); 
     if (typeof ResizeObserver !== "undefined") {
       this.resizeObserver = new ResizeObserver(this.debouncedScaleValue);
     }
     this.containerNodeRef = React.createRef();
   }
 
+  async loadPdfJs() {
+    const modules = await import("pdfjs-dist/web/pdf_viewer");
+    this.EventBus = modules.EventBus; 
+    this.PDFLinkService = modules.PDFLinkService;
+    this.PDFViewer = modules.PDFViewer;
+    this.eventBus = new modules.EventBus() ;
+    this.linkService = new  modules.PDFLinkService({
+      eventBus: this.eventBus,
+      externalLinkTarget: 2,
+    });
+    // const { EventBus, PDFLinkService, PDFViewer } = await import("pdfjs-dist/web/pdf_viewer");
+    // this.setState({
+    //   EventBus,
+    //   PDFLinkService,
+    //   PDFViewer,
+    // });
+  }
+
   componentDidMount() {
-    this.init();
+    const that = this;
+    async function t() {
+      await that.loadPdfJs();
+      that.init();
+    }
+    t();
   }
 
   attachRef = () => {
@@ -172,21 +207,24 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
   init() {
     const { pdfDocument } = this.props;
     this.attachRef();
-
+    if (!this.PDFViewer) return;
     this.viewer =
-      this.viewer ||
-      new PDFViewer({
+      this.viewer || 
+      new this.PDFViewer({
         container: this.containerNodeRef!.current!,
         eventBus: this.eventBus,
         // enhanceTextSelection: true, // deprecated. https://github.com/mozilla/pdf.js/issues/9943#issuecomment-409369485
         textLayerMode: 2,
         removePageBorders: true,
         linkService: this.linkService,
-        l10n: NullL10n,
+        l10n: this.PDFViewer.NullL10n,
       });
 
-    this.linkService.setDocument(pdfDocument);
-    this.linkService.setViewer(this.viewer);
+    if (this.linkService) {
+      this.linkService.setDocument(pdfDocument);
+      this.linkService.setViewer(this.viewer);
+    }
+
     this.viewer.setDocument(pdfDocument);
     // debug
     (window as any).PdfViewer = this;
@@ -204,7 +242,7 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
     }
 
     return findOrCreateContainerLayer(
-      textLayer.textLayerDiv,
+       textLayer.div, //textLayer.textLayerDiv,   FIXME NOT SURE WHY CHANGED?
       "PdfHighlighter__highlight-layer"
     );
   }
@@ -237,6 +275,8 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
             pageNumber,
             boundingRect: highlight!.position.boundingRect,
             rects: [],
+            highlightType: highlight!.position.highlightType || 'highlight',
+            color: highlight!.position.color || 'info',
             usePdfCoordinates: highlight!.position.usePdfCoordinates,
           } as ScaledPosition,
         };
@@ -275,6 +315,8 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
     pageNumber,
     boundingRect,
     rects,
+    highlightType,
+    color,
     usePdfCoordinates,
   }: ScaledPosition): Position {
     const viewport = this.viewer.getPageView(pageNumber - 1).viewport;
@@ -285,6 +327,8 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
         scaledToViewport(rect, viewport, usePdfCoordinates)
       ),
       pageNumber,
+      highlightType,
+      color,
     };
   }
 
@@ -292,6 +336,8 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
     pageNumber,
     boundingRect,
     rects,
+    highlightType,
+    color,
   }: Position): ScaledPosition {
     const viewport = this.viewer.getPageView(pageNumber - 1).viewport;
 
@@ -299,6 +345,8 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
       boundingRect: viewportToScaled(boundingRect, viewport),
       rects: (rects || []).map((rect) => viewportToScaled(rect, viewport)),
       pageNumber,
+      highlightType,
+      color,
     };
   }
 
@@ -506,6 +554,8 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
       boundingRect,
       rects,
       pageNumber: pages[0].number,
+      highlightType: 'highlight',
+      color: 'info',
     };
 
     const content = {
@@ -583,12 +633,16 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
                   top: boundingRect.top - page.node.offsetTop,
                   left: boundingRect.left - page.node.offsetLeft,
                   pageNumber: page.number,
+                  highlightType: 'highlight',
+                  color: 'info',
                 };
 
                 const viewportPosition = {
                   boundingRect: pageBoundingRect,
                   rects: [],
                   pageNumber: page.number,
+                  highlightType: 'highlight',
+                  color: 'info',
                 };
 
                 const scaledPosition =

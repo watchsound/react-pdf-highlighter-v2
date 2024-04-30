@@ -6,7 +6,7 @@
   position: absolute;
   color: black;
   opacity: 1;
-  font-size: 28px;
+  font-size: 16px;
 }
 
 .Highlight__parts {
@@ -15,22 +15,58 @@
 
 .Highlight__part {
   cursor: pointer;
-  position: absolute;
-  background: rgba(255, 226, 143, 1);
-  transition: background 0.3s;
+  position: absolute; 
 }
 
 .Highlight__popup {
-  background-color: #3d464d;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: white;
-  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  color: black;
+  padding: 0.2rem 0.2rem;
   border-radius: 3px;
-  max-width: 300px;
-  max-height: 100px;
+  max-width: 400px;
+  max-height: 200px;
   overflow-y: scroll;
 }
 
 .Highlight--scrolledTo .Highlight__part {
   background: #ff4141;
+}
+
+.Highlight__color_primary {
+  background: #42a5f5;
+} 
+.Highlight__color_secondary{
+  background: #ba68c8;
+} 
+.Highlight__color_error{
+  background: #FF5733;
+} 
+.Highlight__color_warning{
+  background: #ff9800;
+} 
+.Highlight__color_info{
+  background: #3598db;
+} 
+.Highlight__color_success{
+  background: #82dd55;
+} 
+/* Highlight text with a yellow background */
+.Highlight__highlight {
+  /* background: rgba(255, 226, 143, 1); */
+  transition: background 0.3s;
+}
+
+/* Underline text with a solid line */
+.Highlight__underline { 
+}
+
+/* Strike through text with a solid line */
+.Highlight__strikeline {
+}
+
+/* Dashed underline */
+.Highlight__dashline {
+  border-bottom: 2px dashed;
+  heigth: 0px;
 }

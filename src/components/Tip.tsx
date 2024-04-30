@@ -4,12 +4,31 @@ import "../style/Tip.css";
 
 interface State {
   compact: boolean;
-  text: string;
+  title: string;
+  summary: string; // summary from openai if not set
+  mindmap: string;
   emoji: string;
+  hasQuiz: boolean;
+  tags: string[];
+  rate: number;
+  highlightOnly: boolean;
+  color: string;
+  highlightType: string;
 }
 
 interface Props {
-  onConfirm: (comment: { text: string; emoji: string }) => void;
+  onConfirm: (comment: {   
+    title: string;
+    summary: string; // summary from openai if not set
+    mindmap: string;
+    emoji: string;
+    hasQuiz: boolean;
+    tags: string[];
+    rate: number;
+    color: string;
+    highlightType: string;
+    highlightOnly: boolean; 
+  }) => void;
   onOpen: () => void;
   onUpdate?: () => void;
 }
@@ -17,8 +36,16 @@ interface Props {
 export class Tip extends Component<Props, State> {
   state: State = {
     compact: true,
-    text: "",
-    emoji: "",
+    title: '',
+    summary: '',// summary from openai if not set
+    mindmap: '',
+    emoji: '',
+    hasQuiz: false,
+    tags:  [],
+    rate: 0,
+    highlightOnly: false,
+    color: 'info',
+    highlightType: 'highlight',
   };
 
   // for TipContainer
@@ -32,7 +59,7 @@ export class Tip extends Component<Props, State> {
 
   render() {
     const { onConfirm, onOpen } = this.props;
-    const { compact, text, emoji } = this.state;
+    const { compact, title, summary, mindmap, emoji, hasQuiz, tags, rate, highlightOnly, color, highlightType } = this.state;
 
     return (
       <div className="Tip">
@@ -51,23 +78,31 @@ export class Tip extends Component<Props, State> {
             className="Tip__card"
             onSubmit={(event) => {
               event.preventDefault();
-              onConfirm({ text, emoji });
+              onConfirm({ title, summary, mindmap, emoji, hasQuiz, tags, rate, highlightOnly, color, highlightType });
             }}
           >
             <div>
               <textarea
+                placeholder="Note title"
+                autoFocus
+                rows={1}
+                value={title}
+                onChange={(event) =>
+                  this.setState({ title: event.target.value })
+                } 
+              />
+            </div>
+             <div>
+               <textarea
                 placeholder="Your comment"
                 autoFocus
-                value={text}
+                value={summary}
                 onChange={(event) =>
-                  this.setState({ text: event.target.value })
+                  this.setState({ summary: event.target.value })
                 }
-                ref={(node) => {
-                  if (node) {
-                    node.focus();
-                  }
-                }}
+               
               />
+
               <div>
                 {["💩", "😱", "😍", "🔥", "😳", "⚠️"].map((_emoji) => (
                   <label key={_emoji}>

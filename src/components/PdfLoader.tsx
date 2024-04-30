@@ -1,6 +1,17 @@
 import React, { Component } from "react";
 
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/legacy/build/pdf";
+import * as pdfjsLib from "pdfjs-dist";
+import * as pdfWorker from "pdfjs-dist/build/pdf.worker.mjs";
+
+// // Setting the worker path to the worker bundle.
+// pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+
+// Importing the required modules from the pdfjsLib object
+const {
+    getDocument,
+    GlobalWorkerOptions
+} = pdfjsLib;
+
 import type { PDFDocumentProxy } from "pdfjs-dist";
 
 interface Props {
@@ -28,7 +39,7 @@ export class PdfLoader extends Component<Props, State> {
   };
 
   static defaultProps = {
-    workerSrc: "https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js",
+     workerSrc: pdfWorker, // "https://unpkg.com/pdfjs-dist@4.1.392/build/pdf.mjs",
   };
 
   documentRef = React.createRef<HTMLElement>();

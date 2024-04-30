@@ -1,8 +1,8 @@
 {
-  "name": "react-pdf-highlighter",
+  "name": "react-pdf-highlighter-updated",
   "version": "6.1.0",
-  "description": "Set of React components for PDF annotation",
-  "author": "Artem Tyurin <artem.tyurin@gmail.com>",
+  "description": "Set of React components for PDF annotation. this package updates pdfjs version and add some annotation",
+  "author": "Artem Tyurin <artem.tyurin@gmail.com>  hanning ni",
   "license": "MIT",
   "keywords": [
     "pdf",
@@ -36,8 +36,8 @@
   },
   "dependencies": {
     "lodash.debounce": "^4.0.8",
-    "pdfjs-dist": "2.16.105",
-    "react-rnd": "^10.1.10"
+    "react-rnd": "^10.1.10",
+    "pdfjs-dist": "4.1.392"
   },
   "repository": {
     "type": "git",

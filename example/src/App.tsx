@@ -36,15 +36,15 @@ const resetHash = () => {
 const HighlightPopup = ({
   comment,
 }: {
-  comment: { text: string; emoji: string };
+  comment: { title: string; summary: string; emoji: string };
 }) =>
-  comment.text ? (
+  (comment.title || comment.summary) ? (
     <div className="Highlight__popup">
-      {comment.emoji} {comment.text}
+      {comment.emoji} {comment.title || comment.summary}
     </div>
   ) : null;
 
-const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
+const PRIMARY_PDF_URL = "fastcheckingjs.pdf";
 const SECONDARY_PDF_URL = "https://arxiv.org/pdf/1604.02480.pdf";
 
 const searchParams = new URLSearchParams(document.location.search);
@@ -157,8 +157,7 @@ class App extends Component<{}, State> {
                 onScrollChange={resetHash}
                 // pdfScaleValue="page-width"
                 scrollRef={(scrollTo) => {
-                  this.scrollViewerTo = scrollTo;
-
+                  this.scrollViewerTo = scrollTo;  
                   this.scrollToHighlightFromHash();
                 }}
                 onSelectionFinished={(
@@ -170,7 +169,7 @@ class App extends Component<{}, State> {
                   <Tip
                     onOpen={transformSelection}
                     onConfirm={(comment) => {
-                      this.addHighlight({ content, position, comment });
+                      this.addHighlight({ content, position, comment: comment });
 
                       hideTipAndSelection();
                     }}
